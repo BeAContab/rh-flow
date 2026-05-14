@@ -27,5 +27,18 @@ export const submissions = sqliteTable("submissions", {
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 });
 
+export const attachments = sqliteTable("attachments", {
+  id: text("id").primaryKey(),
+  submissionId: text("submission_id").notNull(),
+  fileName: text("file_name").notNull(),
+  blobUrl: text("blob_url").notNull(),
+  blobPathname: text("blob_pathname").notNull(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  uploadedByUserId: text("uploaded_by_user_id"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+});
+
 export type UserRecord = typeof users.$inferSelect;
 export type SubmissionRecord = typeof submissions.$inferSelect;
+export type AttachmentRecord = typeof attachments.$inferSelect;

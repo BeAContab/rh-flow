@@ -2,28 +2,29 @@ import Link from "next/link";
 
 import { RecentSubmissions } from "@/components/recent-submissions";
 import { requireSession } from "@/lib/auth";
-import { listRecentSubmissions } from "@/lib/submissions";
+import { getRoleLabel } from "@/lib/roles";
+import { listRecentSubmissionsForSession } from "@/lib/submissions";
 
 const cards = [
   {
     href: "/admissao",
     eyebrow: "Fluxo 01",
-    title: "Admissão",
+    title: "Admissao",
     description:
-      "Cadastre novos colaboradores com seções dedicadas para dados pessoais, documentos, contrato, jornada e dependentes.",
+      "Cadastre novos colaboradores com secoes dedicadas para dados pessoais, documentos, contrato, jornada e dependentes.",
   },
   {
     href: "/movimentacoes",
     eyebrow: "Fluxo 02",
-    title: "Rescisão, Férias e Alterações",
+    title: "Rescisao, Ferias e Alteracoes",
     description:
-      "Registre alterações cadastrais e contratuais, programe férias e acompanhe eventos de rescisão em um único fluxo.",
+      "Registre alteracoes cadastrais e contratuais, programe ferias e acompanhe eventos de rescisao em um unico fluxo.",
   },
 ];
 
 export default async function DashboardPage() {
   const session = await requireSession();
-  const submissions = await listRecentSubmissions();
+  const submissions = await listRecentSubmissionsForSession(session);
 
   return (
     <main className="container-page py-10">
@@ -34,21 +35,21 @@ export default async function DashboardPage() {
               RH Flow
             </p>
             <h1 className="mt-4 max-w-3xl text-5xl font-semibold tracking-tight">
-              Olá, {session.name}. O ambiente está pronto para operar os fluxos da FIF.
+              Ola, {session.name}. O ambiente esta pronto para operar os fluxos da FIF.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">
-              Acesse os formulários principais, acompanhe os registros mais recentes e mantenha o histórico vinculado ao usuário logado.
+              Acesse os formularios principais, acompanhe os registros recentes permitidos ao seu perfil e mantenha o historico vinculado ao usuario logado.
             </p>
           </div>
 
           <div className="grid gap-3 self-end">
             <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
-              <p className="text-sm font-semibold text-white">Usuário autenticado</p>
+              <p className="text-sm font-semibold text-white">Usuario autenticado</p>
               <p className="mt-2 text-sm leading-6 text-slate-200">{session.email}</p>
             </div>
             <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
               <p className="text-sm font-semibold text-white">Perfil atual</p>
-              <p className="mt-2 text-sm leading-6 text-slate-200 capitalize">{session.role}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-200">{getRoleLabel(session.role)}</p>
             </div>
           </div>
         </div>
@@ -63,7 +64,7 @@ export default async function DashboardPage() {
             <h2 className="mt-4 text-3xl font-semibold text-slate-950">{card.title}</h2>
             <p className="mt-4 text-base leading-7 text-slate-600">{card.description}</p>
             <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-              Abrir formulário
+              Abrir formulario
               <span className="transition group-hover:translate-x-1">-&gt;</span>
             </span>
           </Link>
@@ -71,7 +72,7 @@ export default async function DashboardPage() {
       </section>
 
       <div className="mt-10">
-        <RecentSubmissions submissions={submissions} />
+        <RecentSubmissions currentRole={session.role} submissions={submissions} />
       </div>
     </main>
   );

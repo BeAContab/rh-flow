@@ -10,6 +10,7 @@ export default async function AdmissaoPage() {
       <DynamicForm
         definition={admissaoFormDefinition}
         defaultValues={getInitialValues(admissaoFormDefinition)}
+        initialAttachments={[]}
       />
     </main>
   );

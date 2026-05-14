@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createSession, setSessionCookie } from "@/lib/auth";
+import type { AppRole } from "@/lib/roles";
 import { validateUserCredentials } from "@/lib/users";
 
 const loginSchema = z.object({
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
       userId: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: user.role as AppRole,
       status: user.status,
     });
 

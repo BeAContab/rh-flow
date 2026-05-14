@@ -4,7 +4,7 @@
   "description": "App web para formularios FIF com Next.js, Turso e Drizzle.",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -16,16 +16,20 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@vercel/blob": "^2.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@libsql/client": "^0.17.3",
+    "@vercel/blob": "^2.3.3",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.3",
     "next": "^16.2.6",
+    "pdf-lib": "^1.17.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.75.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {

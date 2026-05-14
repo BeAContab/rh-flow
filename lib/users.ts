@@ -2,13 +2,14 @@ import { compare, hash } from "bcryptjs";
 import { desc, eq } from "drizzle-orm";
 
 import { ensureDatabase, getDb } from "@/lib/db";
+import type { AppRole } from "@/lib/roles";
 import { users } from "@/lib/schema";
 
 export type CreateUserInput = {
   name: string;
   email: string;
   password: string;
-  role?: "admin" | "user";
+  role?: AppRole;
   createdByUserId?: string;
 };
 
@@ -23,7 +24,7 @@ export async function createUser(input: CreateUserInput) {
   const normalizedEmail = input.email.trim().toLowerCase();
   const existing = await findUserByEmail(normalizedEmail);
   if (existing) {
-    throw new Error("Já existe um usuário com esse e-mail.");
+    throw new Error("Ja existe um usuario com esse e-mail.");
   }
 
   const now = new Date();
@@ -67,7 +68,7 @@ export async function validateUserCredentials(email: string, password: string) {
   }
 
   if (user.status !== "approved") {
-    throw new Error("Seu acesso ainda não está liberado.");
+    throw new Error("Seu acesso ainda nao esta liberado.");
   }
 
   return user;
