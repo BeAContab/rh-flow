@@ -13,10 +13,11 @@ export async function AppHeader() {
         </Link>
         {session ? (
           <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
-            <Link href="/dashboard">Início</Link>
-            <Link href="/admissao">Admissão</Link>
-            <Link href="/movimentacoes">Movimentações</Link>
-            {session.role === "admin" ? <Link href="/usuarios">Usuários</Link> : null}
+            <Link href="/dashboard">Inicio</Link>
+            <Link href="/admissao">Admissao</Link>
+            <Link href="/movimentacoes">Movimentacoes</Link>
+            <Link href="/relatorios">Relatorios</Link>
+            {session.role === "admin" || session.role === "super_user" ? <Link href="/usuarios">Usuarios</Link> : null}
             <form action="/api/auth/logout" method="post">
               <button type="submit">Sair</button>
             </form>

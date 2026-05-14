@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getCurrentSession } from "@/lib/auth";
-import { saveSubmission } from "@/lib/submissions";
+import { canEditSubmission, getSubmissionById, saveSubmission } from "@/lib/submissions";
 
 const submissionSchema = z.object({
   id: z.string().optional(),
@@ -15,10 +15,21 @@ export async function POST(request: Request) {
   try {
     const session = await getCurrentSession();
     if (!session) {
-      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+      return NextResponse.json({ error: "Nao autenticado." }, { status: 401 });
     }
 
     const payload = submissionSchema.parse(await request.json());
+    if (payload.id) {
+      const existing = await getSubmissionById(payload.id);
+      if (!existing) {
+        return NextResponse.json({ error: "Registro nao encontrado." }, { status: 404 });
+      }
+
+      if (!canEditSubmission(session, existing)) {
+        return NextResponse.json({ error: "Voce nao pode editar este formulario." }, { status: 403 });
+      }
+    }
+
     const result = await saveSubmission({
       ...payload,
       actor: {

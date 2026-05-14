@@ -10,6 +10,7 @@ export default async function MovimentacoesPage() {
       <DynamicForm
         definition={movimentacoesFormDefinition}
         defaultValues={getInitialValues(movimentacoesFormDefinition)}
+        initialAttachments={[]}
       />
     </main>
   );

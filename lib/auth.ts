@@ -2,21 +2,23 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
 
+import type { AppRole } from "@/lib/roles";
+
 const SESSION_COOKIE = "fif_session";
 const encoder = new TextEncoder();
 
-type SessionPayload = {
+export type SessionPayload = {
   userId: string;
   name: string;
   email: string;
-  role: string;
+  role: AppRole;
   status: string;
 };
 
 function getSessionSecret() {
   const secret = process.env.SESSION_SECRET;
   if (!secret) {
-    throw new Error("SESSION_SECRET não configurado.");
+    throw new Error("SESSION_SECRET nao configurado.");
   }
   return encoder.encode(secret);
 }
@@ -59,6 +61,14 @@ export async function requireSession() {
 export async function requireAdminSession() {
   const session = await requireSession();
   if (session.role !== "admin") {
+    redirect("/dashboard");
+  }
+  return session;
+}
+
+export async function requireUserManagementSession() {
+  const session = await requireSession();
+  if (session.role !== "admin" && session.role !== "super_user") {
     redirect("/dashboard");
   }
   return session;

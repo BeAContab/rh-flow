@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { AttachmentsDropzone } from "@/components/attachments-dropzone";
 import { scheduleColumns, weekdays } from "@/lib/forms/brazil";
 import { admissaoSchema, movimentacoesSchema } from "@/lib/forms/config";
 import type { FormDefinition, FormField, FormOption } from "@/lib/forms/types";
+import type { AttachmentRecord } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 
 type DynamicFormProps = {
   definition: FormDefinition;
   defaultValues: Record<string, string | boolean>;
+  initialAttachments: AttachmentRecord[];
+  initialSubmissionId?: string;
 };
 
 type SubmissionState = {
@@ -126,17 +130,28 @@ function getScheduleFieldName(dayId: string, columnKey: string) {
   return `${dayId}${columnKey.charAt(0).toUpperCase()}${columnKey.slice(1)}`;
 }
 
-export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
+export function DynamicForm({
+  definition,
+  defaultValues,
+  initialAttachments,
+  initialSubmissionId = "",
+}: DynamicFormProps) {
   const router = useRouter();
-  const [submissionId, setSubmissionId] = useState<string>("");
+  const [existingAttachments, setExistingAttachments] =
+    useState<AttachmentRecord[]>(initialAttachments);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [submissionId, setSubmissionId] = useState<string>(initialSubmissionId);
   const [submissionState, setSubmissionState] = useState<SubmissionState>({
     kind: "idle",
-    message: "Preencha os campos e salve quando quiser.",
+    message: initialSubmissionId
+      ? "Modo edicao ativo. Atualize os campos necessarios e salve novamente."
+      : "Preencha os campos e salve quando quiser.",
   });
   const [cityOptionsByField, setCityOptionsByField] = useState<CityOptionsByField>({});
   const [toastVisible, setToastVisible] = useState(false);
 
   const schema = definition.flowType === "admissao" ? admissaoSchema : movimentacoesSchema;
+  const isEditMode = Boolean(initialSubmissionId);
 
   const {
     register,
@@ -199,15 +214,13 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
       .filter((field) => field.autoComplete === "city" && field.dependsOn);
 
     fieldsWithCities.forEach((field) => {
-      const selectedUf =
-        field.dependsOn === "birthState" ? birthStateValue : addressStateValue;
+      const selectedUf = field.dependsOn === "birthState" ? birthStateValue : addressStateValue;
 
       if (!selectedUf) {
         setCityOptionsByField((current) => ({
           ...current,
           [field.name]: [{ label: "Selecione a UF primeiro", value: "" }],
         }));
-        setValue(field.name, "");
         return;
       }
 
@@ -232,7 +245,7 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
         .catch(() => {
           setCityOptionsByField((current) => ({
             ...current,
-            [field.name]: [{ label: "Não foi possível carregar os municípios", value: "" }],
+            [field.name]: [{ label: "Nao foi possivel carregar os municipios", value: "" }],
           }));
         });
 
@@ -275,7 +288,7 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
           setValue("streetType", detectedType, { shouldDirty: true });
         }
       } catch {
-        // O preenchimento manual continua disponível se a busca falhar.
+        // O preenchimento manual continua disponivel se a busca falhar.
       }
     },
     [setValue, streetTypeValue],
@@ -300,12 +313,34 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
     if (!response.ok) {
       throw new Error(
         data.error ||
-          "Não foi possível salvar o formulário. Revise os campos preenchidos e tente novamente.",
+          "Nao foi possivel salvar o formulario. Revise os campos preenchidos e tente novamente.",
       );
     }
 
     setSubmissionId(data.id);
-    return data.id;
+    return data.id as string;
+  }
+
+  async function uploadPendingFiles(targetSubmissionId: string) {
+    if (pendingFiles.length === 0) {
+      return;
+    }
+
+    const formData = new FormData();
+    pendingFiles.forEach((file) => formData.append("files", file));
+
+    const response = await fetch(`/api/submissions/${targetSubmissionId}/attachments`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Nao foi possivel enviar os anexos.");
+    }
+
+    setExistingAttachments((current) => [...data.attachments, ...current]);
+    setPendingFiles([]);
   }
 
   function renderScheduleTable() {
@@ -415,6 +450,11 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
     );
   }
 
+  async function handleSave(formValues: Record<string, unknown>, status: "draft" | "submitted") {
+    const savedId = await submitForm(formValues, status);
+    await uploadPendingFiles(savedId);
+  }
+
   return (
     <>
       <div
@@ -456,6 +496,15 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                 <span>{section.title}</span>
               </a>
             ))}
+            <a
+              href="#anexos"
+              className="flex items-start gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            >
+              <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 font-semibold text-slate-900">
+                {sectionList.length + 1}
+              </span>
+              <span>Anexos</span>
+            </a>
           </div>
         </aside>
 
@@ -463,14 +512,16 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
           className="space-y-6"
           onSubmit={handleSubmit(async (formValues) => {
             try {
-              await submitForm(formValues, "submitted");
+              await handleSave(formValues, "submitted");
               setSubmissionState({
                 kind: "success",
-                message: "Formulário concluído com sucesso. Você será redirecionado para a tela inicial.",
+                message: isEditMode
+                  ? "Relatorio atualizado com sucesso. Voce sera redirecionado para a tela de relatorios."
+                  : "Formulario concluido com sucesso. Voce sera redirecionado para a tela inicial.",
               });
               setToastVisible(true);
               window.setTimeout(() => {
-                router.push("/");
+                router.push(isEditMode ? "/relatorios" : "/");
                 router.refresh();
               }, 1200);
             } catch (error) {
@@ -478,8 +529,8 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                 kind: "error",
                 message:
                   error instanceof Error
-                    ? `${error.message} Se o problema continuar, revise os campos obrigatórios, confirme sua conexão e tente novamente.`
-                    : "Não foi possível concluir o envio. Revise os campos e tente novamente.",
+                    ? `${error.message} Se o problema continuar, revise os campos obrigatorios, confirme sua conexao e tente novamente.`
+                    : "Nao foi possivel concluir o envio. Revise os campos e tente novamente.",
               });
               setToastVisible(true);
             }
@@ -487,7 +538,7 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
         >
           <div className="card p-8">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">
-              Fluxo principal
+              {isEditMode ? "Edicao administrativa" : "Fluxo principal"}
             </p>
             <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">
               {definition.title}
@@ -535,7 +586,7 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                     {renderScheduleTable()}
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="scheduleNotes">
-                        Observações da escala
+                        Observacoes da escala
                       </label>
                       <textarea id="scheduleNotes" {...register("scheduleNotes")} />
                     </div>
@@ -545,25 +596,25 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                     {renderDependentsTable()}
                     <div className="field-grid">
                       {regularFields.map((field) => {
-                          const error = errors[field.name];
-                          return (
-                            <div key={field.name} className={spanClass(field.span)}>
-                              <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor={field.name}>
-                                {field.label}
-                              </label>
-                              {field.type === "textarea" ? (
-                                <textarea id={field.name} {...register(field.name)} />
-                              ) : (
-                                <input id={field.name} type={getFieldType(field)} {...register(field.name)} />
-                              )}
-                              {error ? (
-                                <p className="mt-2 text-sm text-rose-600">
-                                  {String(error.message || "Campo inválido")}
-                                </p>
-                              ) : null}
-                            </div>
-                          );
-                        })}
+                        const error = errors[field.name];
+                        return (
+                          <div key={field.name} className={spanClass(field.span)}>
+                            <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor={field.name}>
+                              {field.label}
+                            </label>
+                            {field.type === "textarea" ? (
+                              <textarea id={field.name} {...register(field.name)} />
+                            ) : (
+                              <input id={field.name} type={getFieldType(field)} {...register(field.name)} />
+                            )}
+                            {error ? (
+                              <p className="mt-2 text-sm text-rose-600">
+                                {String(error.message || "Campo invalido")}
+                              </p>
+                            ) : null}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
@@ -655,7 +706,7 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
 
                           {error ? (
                             <p className="mt-2 text-sm text-rose-600">
-                              {String(error.message || "Campo inválido")}
+                              {String(error.message || "Campo invalido")}
                             </p>
                           ) : null}
                         </div>
@@ -667,20 +718,31 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
             );
           })}
 
+          <div id="anexos">
+            <AttachmentsDropzone
+              existingAttachments={existingAttachments}
+              onPendingFilesChange={setPendingFiles}
+              pendingFiles={pendingFiles}
+            />
+          </div>
+
           <div className="sticky bottom-4 flex flex-col gap-4 rounded-[1.5rem] border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between">
             <button
               className="rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               onClick={() => {
                 reset(defaultValues);
-                setSubmissionId("");
+                setPendingFiles([]);
+                setSubmissionId(initialSubmissionId);
                 setSubmissionState({
                   kind: "idle",
-                  message: "Formulário limpo. Você pode preencher novamente.",
+                  message: isEditMode
+                    ? "Valores restaurados para a versao carregada."
+                    : "Formulario limpo. Voce pode preencher novamente.",
                 });
               }}
               type="button"
             >
-              Limpar
+              {isEditMode ? "Restaurar" : "Limpar"}
             </button>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -689,10 +751,10 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                 disabled={isSubmitting}
                 onClick={handleSubmit(async (formValues) => {
                   try {
-                    await submitForm(formValues, "draft");
+                    await handleSave(formValues, "draft");
                     setSubmissionState({
                       kind: "success",
-                      message: "Rascunho salvo com sucesso.",
+                      message: isEditMode ? "Rascunho atualizado com sucesso." : "Rascunho salvo com sucesso.",
                     });
                     setToastVisible(true);
                   } catch (error) {
@@ -700,8 +762,8 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                       kind: "error",
                       message:
                         error instanceof Error
-                          ? `${error.message} Se o problema continuar, confirme sua conexão e tente novamente.`
-                          : "Não foi possível salvar o rascunho.",
+                          ? `${error.message} Se o problema continuar, confirme sua conexao e tente novamente.`
+                          : "Nao foi possivel salvar o rascunho.",
                     });
                     setToastVisible(true);
                   }
@@ -716,7 +778,7 @@ export function DynamicForm({ definition, defaultValues }: DynamicFormProps) {
                 disabled={isSubmitting}
                 type="submit"
               >
-                {isSubmitting ? "Enviando..." : "Salvar e enviar"}
+                {isSubmitting ? "Enviando..." : isEditMode ? "Atualizar relatorio" : "Salvar e enviar"}
               </button>
             </div>
           </div>

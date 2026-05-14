@@ -109,6 +109,20 @@ export async function ensureDatabase() {
     )
   `);
 
+  await currentClient.execute(`
+    CREATE TABLE IF NOT EXISTS attachments (
+      id TEXT PRIMARY KEY NOT NULL,
+      submission_id TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      blob_url TEXT NOT NULL,
+      blob_pathname TEXT NOT NULL,
+      content_type TEXT NOT NULL,
+      size INTEGER NOT NULL,
+      uploaded_by_user_id TEXT,
+      created_at INTEGER NOT NULL
+    )
+  `);
+
   await addColumnIfMissing("submissions", "created_by_user_id", "TEXT");
   await addColumnIfMissing("submissions", "created_by_user_name", "TEXT");
   await addColumnIfMissing("submissions", "created_by_user_email", "TEXT");
