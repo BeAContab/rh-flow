@@ -1,0 +1,2 @@
+# Projeto principal em Node.js / Next.js.
+# Nenhuma dependencia Python e necessaria nesta fase.

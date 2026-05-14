@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RH Flow - Fluxo de Alterações e Rescisão</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9ff;
+        }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed-variant": "#41474e",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#d0daf0",
+                      "surface-container": "#e7eeff",
+                      "surface-container-high": "#dee8ff",
+                      "surface-variant": "#d9e3f9",
+                      "on-primary-fixed-variant": "#364768",
+                      "secondary-fixed": "#d8e3fa",
+                      "on-secondary-fixed": "#111c2c",
+                      "secondary-fixed-dim": "#bcc7dd",
+                      "surface-container-low": "#f0f3ff",
+                      "surface": "#f9f9ff",
+                      "surface-tint": "#4e5e81",
+                      "on-tertiary-fixed": "#161c22",
+                      "primary": "#031635",
+                      "on-secondary-fixed-variant": "#3c475a",
+                      "on-primary": "#ffffff",
+                      "primary-container": "#1a2b4b",
+                      "on-tertiary-container": "#8d939b",
+                      "on-error": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary": "#11181d",
+                      "inverse-surface": "#273141",
+                      "background": "#f9f9ff",
+                      "on-secondary-container": "#586377",
+                      "surface-container-highest": "#d9e3f9",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "on-surface": "#121c2c",
+                      "surface-bright": "#f9f9ff",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#b6c6ef",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#b6c6ef",
+                      "outline-variant": "#c5c6cf",
+                      "on-primary-container": "#8293b8",
+                      "on-primary-fixed": "#081b3a",
+                      "tertiary-fixed": "#dde3eb",
+                      "tertiary-fixed-dim": "#c1c7cf",
+                      "on-background": "#121c2c",
+                      "secondary": "#545f72",
+                      "on-surface-variant": "#44474e",
+                      "error-container": "#ffdad6",
+                      "outline": "#75777f",
+                      "tertiary-container": "#262c32",
+                      "inverse-on-surface": "#ebf1ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-mobile": "16px",
+                      "container-max-width": "1200px",
+                      "margin-desktop": "40px",
+                      "unit": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Manrope"],
+                      "body-lg": ["Inter"],
+                      "headline-lg-mobile": ["Manrope"],
+                      "title-md": ["Manrope"],
+                      "label-md": ["Inter"],
+                      "caption": ["Inter"],
+                      "display-lg": ["Manrope"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center px-gutter w-full h-16 sticky top-0 z-50 bg-surface border-b border-outline-variant shadow-sm">
+<div class="flex items-center gap-4">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">RH Flow</span>
+</div>
+<nav class="hidden md:flex gap-8 items-center h-full">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Início</a>
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Processos</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Relatórios</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Configurações</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden border border-outline-variant">
+<img alt="Foto de Perfil do Usuário" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate executive in a crisp white shirt and dark blazer, set against a blurred office background with soft natural lighting. The image conveys authority and approachability with high-key lighting and a neutral, professional color palette of blues and grays." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgd2EM2f8kuIaT99UfBO1hncDTH2xU2MmngdsvDyhD5GFwmjRwmbzOkT_MhIIy9qNy8y35m8MTNARwI8_L-1imQvXUI2XhqVLXjqpPZpFGVIEnW14pZMCbS1utN1UZiPrS4_f1IPBkzgTVfgkKJoxChIAYO7hrRwIRWFVti_X36u7sUjWdh9mEhd2wle5c2EahZWDU5ep0PsMD2hzXLWL4cHB7qE9ML42z9F7SquVz2-PIAQbj-tlM7yHdSwPB96WrbSE7_Q697rqt"/>
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- Sidebar Navigation -->
+<aside class="h-[calc(100vh-64px)] w-64 fixed left-0 top-16 bg-surface-container-low border-r border-outline-variant overflow-y-auto">
+<div class="flex flex-col py-8 gap-1">
+<div class="px-6 mb-6">
+<h2 class="font-title-md text-title-md text-primary">Alterações &amp; Rescisão</h2>
+<p class="font-caption text-caption text-secondary">Gestão de Ciclo de Vida</p>
+</div>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">person</span> Empregador/Empregado
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">contact_page</span> Alterações Pessoais
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">description</span> Alteração Contratual
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-primary font-bold border-l-4 border-primary bg-surface-variant transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">payments</span> Alteração Salarial
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">redeem</span> Benefícios
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">schedule</span> Jornada/Escala
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">beach_access</span> Férias
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">person_remove</span> Rescisão
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary hover:bg-surface-container transition-all font-label-md text-label-md border-t border-outline-variant mt-4" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span> Controle Interno
+                </a>
+</div>
+<div class="mt-auto p-6 space-y-2">
+<a class="flex items-center gap-3 text-secondary hover:text-primary transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">support_agent</span> Suporte
+                </a>
+<a class="flex items-center gap-3 text-secondary hover:text-primary transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">logout</span> Sair
+                </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 w-full min-h-screen pb-32">
+<div class="max-w-4xl mx-auto px-margin-desktop py-12">
+<header class="mb-12">
+<nav class="flex mb-4 gap-2 text-secondary font-caption text-caption">
+<span>Processos</span>
+<span>/</span>
+<span class="text-primary font-bold">Alteração Salarial e Rescisão</span>
+</nav>
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Formulário de Alterações</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                        Atualize os dados contratuais, registre períodos de férias ou inicie o processo de desligamento de colaboradores de forma segura e padronizada.
+                    </p>
+</header>
+<div class="space-y-8">
+<!-- Section: Employee Identification -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)]">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<span class="material-symbols-outlined text-primary">person_search</span>
+<h3 class="font-title-md text-title-md text-primary uppercase tracking-wider">Identificação do Colaborador</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Nome do Funcionário</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Ex: Roberto Silva" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Matrícula / CPF</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="000.000.000-00" type="text"/>
+</div>
+</div>
+</section>
+<!-- Section: Salary Change (Detailed Pattern) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)]">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<span class="material-symbols-outlined text-primary">payments</span>
+<h3 class="font-title-md text-title-md text-primary uppercase tracking-wider">Alteração Salarial</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Novo Salário Base (R$)</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" step="0.01" type="number"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Data de Vigência</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Motivo da Alteração Salarial</label>
+<textarea class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" placeholder="Descreva detalhadamente o motivo (Promoção, Mérito, Dissídio, etc.)" rows="4"></textarea>
+</div>
+</section>
+<!-- Section: Vacation (Date Range) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)]">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<span class="material-symbols-outlined text-primary">beach_access</span>
+<h3 class="font-title-md text-title-md text-primary uppercase tracking-wider">Agendamento de Férias</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Período Aquisitivo (Início)</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Período Aquisitivo (Fim)</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Data Início do Gozo</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Dias de Gozo</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" max="30" type="number"/>
+</div>
+</div>
+</section>
+<!-- Section: Termination (Select, Radio, Dates) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] border-l-4 border-l-error">
+<div class="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+<span class="material-symbols-outlined text-error">person_remove</span>
+<h3 class="font-title-md text-title-md text-error uppercase tracking-wider">Processo de Rescisão</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Causa da Demissão</label>
+<select class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+<option value="">Selecione o motivo...</option>
+<option value="justa-causa">Dispensa com Justa Causa</option>
+<option value="sem-justa-causa">Dispensa sem Justa Causa</option>
+<option value="pedido">Pedido de Demissão</option>
+<option value="acordo">Acordo Comum</option>
+<option value="termino-contrato">Término de Contrato</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Data da Demissão (Último dia)</label>
+<input class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date"/>
+</div>
+</div>
+<div class="mb-8">
+<label class="font-label-md text-label-md text-on-surface-variant block mb-4">Aviso Prévio</label>
+<div class="flex flex-wrap gap-6">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline focus:ring-primary" name="aviso" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Trabalhado</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline focus:ring-primary" name="aviso" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Indenizado</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline focus:ring-primary" name="aviso" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Dispensado</span>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Observações Gerais</label>
+<textarea class="bg-surface border border-outline rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none" placeholder="Informações adicionais relevantes para o desligamento..." rows="3"></textarea>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+<!-- Action Footer Bar -->
+<footer class="fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant z-50 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<div class="max-w-container-max-width mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex flex-col items-start">
+<span class="font-caption text-caption text-secondary">© 2024 RH Flow - Uso Interno Corporativo</span>
+<div class="flex gap-4 mt-1">
+<a class="font-caption text-caption text-secondary hover:text-primary underline" href="#">Termos de Uso</a>
+<a class="font-caption text-caption text-secondary hover:text-primary underline" href="#">Privacidade</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2.5 rounded-lg border border-outline text-secondary font-label-md text-label-md hover:bg-surface-container transition-all">
+                    Limpar
+                </button>
+<button class="px-6 py-2.5 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-surface-variant transition-all">
+                    Salvar Rascunho
+                </button>
+<button class="px-8 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all shadow-md">
+                    Finalizar Processo
+                </button>
+</div>
+</div>
+</footer>
+</body></html>

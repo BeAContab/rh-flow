@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RH Flow - Portal de Gestão</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d0daf0",
+                        "surface-container": "#e7eeff",
+                        "surface-container-high": "#dee8ff",
+                        "surface-variant": "#d9e3f9",
+                        "on-primary-fixed-variant": "#364768",
+                        "secondary-fixed": "#d8e3fa",
+                        "on-secondary-fixed": "#111c2c",
+                        "secondary-fixed-dim": "#bcc7dd",
+                        "surface-container-low": "#f0f3ff",
+                        "surface": "#f9f9ff",
+                        "surface-tint": "#4e5e81",
+                        "on-tertiary-fixed": "#161c22",
+                        "primary": "#031635",
+                        "on-secondary-fixed-variant": "#3c475a",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#1a2b4b",
+                        "on-tertiary-container": "#8d939b",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#11181d",
+                        "inverse-surface": "#273141",
+                        "background": "#f9f9ff",
+                        "on-secondary-container": "#586377",
+                        "surface-container-highest": "#d9e3f9",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-surface": "#121c2c",
+                        "surface-bright": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#b6c6ef",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#b6c6ef",
+                        "outline-variant": "#c5c6cf",
+                        "on-primary-container": "#8293b8",
+                        "on-primary-fixed": "#081b3a",
+                        "tertiary-fixed": "#dde3eb",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "on-background": "#121c2c",
+                        "secondary": "#545f72",
+                        "on-surface-variant": "#44474e",
+                        "error-container": "#ffdad6",
+                        "outline": "#75777f",
+                        "tertiary-container": "#262c32",
+                        "inverse-on-surface": "#ebf1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "container-max-width": "1200px",
+                        "margin-desktop": "40px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Manrope"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Manrope"],
+                        "title-md": ["Manrope"],
+                        "label-md": ["Inter"],
+                        "caption": ["Inter"],
+                        "display-lg": ["Manrope"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9ff;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center px-gutter w-full h-16 sticky top-0 z-50 bg-surface dark:bg-primary-container shadow-sm border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-12">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">RH Flow</span>
+<nav class="hidden md:flex gap-8">
+<a class="font-body-md text-body-md text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-1 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Início</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Processos</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Relatórios</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Configurações</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden ml-2 border border-outline-variant">
+<img alt="Foto de Perfil do Usuário" class="h-full w-full object-cover" data-alt="A professional headshot of a corporate executive in a modern office environment. The lighting is bright and high-key, emphasizing a light-mode aesthetic. The man is wearing a tailored charcoal suit and a crisp white shirt, looking confident and approachable. The background features soft bokeh of a professional glass-walled workspace with subtle blue and gray tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuzegyvPijKAXj5Ag-tD6pBxfLbAfzEcSPIftlwGR7CXHTb3DyWAuEQUKvuZCcoq_ELEINg-xpgHKwhyae8_yysmVaKdhU5wkMxp_3qHF-D-FHsmT5NSW2RPVLgVCvuS7aiJiGKdTKsGT9weaHC2WEsZfY_awcW6YI6dHfIfH3gh_oStC7sQlC67MwRIpNTdXO_DwQ_StZh5_LwhmGGaErx3cfWkMGgARWvpfVdxJuL3QmRupuVIcSJovzFTgVAn3zKRRtwytEFDfs"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-12">
+<!-- Hero Section -->
+<section class="mb-16">
+<div class="relative rounded-xl overflow-hidden bg-primary-container min-h-[320px] flex flex-col justify-center p-8 md:p-16 shadow-lg">
+<!-- Background Image Layer -->
+<div class="absolute inset-0 z-0">
+<img alt="Portal de Gestão background" class="w-full h-full object-cover opacity-20 grayscale" data-alt="A sophisticated wide-angle view of a modern, high-end corporate office lobby with soaring glass ceilings and minimalist architecture. The scene is bathed in bright, natural morning light, creating a clean and authoritative atmosphere. The color palette is dominated by professional navy blues, cool grays, and bright whites, reflecting a corporate modern design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEv-74-nqdEidT_3pTkP_Er-DSiuotncSeS-EA9v4R4m3CrNjHUMmb5HXLSIsY388OHdJG10QslfjEsNrQLDrLvej9Uhe2ohvMB7s_KqS5V8EEj6oBU6K9vRny39fNY3e0uKgx1PWzrnhV8WUPeiownhs3UwUTI0vYy43lR5eE30xyMJW1bcIOiJPQ3pZ1Vtvtmim3YQWffVzfVrumDt3I-z51Uw6gCZ1Jdo7QDkFEkferq9DwFcebzb6X19f-F3oNQ6_oVzWVsvOv"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary-container via-primary-container/90 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-2xl">
+<h1 class="font-display-lg text-display-lg text-white mb-4 tracking-tight">Bem-vindo ao Portal de Gestão de RH</h1>
+<p class="font-body-lg text-body-lg text-on-primary-container max-w-lg leading-relaxed">Selecione o fluxo desejado para iniciar o preenchimento de forma rápida e segura.</p>
+</div>
+</div>
+</section>
+<!-- Action Cards Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Card Admission -->
+<div class="group bg-surface-container-lowest border border-outline-variant p-10 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-start cursor-pointer active:scale-[0.98]">
+<div class="w-16 h-16 bg-surface-container-high rounded-lg flex items-center justify-center mb-8 group-hover:bg-primary-container group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[32px] text-primary group-hover:text-white" data-icon="person_add">person_add</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Fluxo de Admissão</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed">Inicie o registro de novos colaboradores com todas as seções necessárias (dados pessoais, contrato, benefícios).</p>
+<div class="mt-auto flex items-center text-primary font-bold gap-2 group-hover:translate-x-2 transition-transform">
+<span class="font-label-md text-label-md">INICIAR ADMISSÃO</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Card Offboarding/Changes -->
+<div class="group bg-surface-container-lowest border border-outline-variant p-10 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-start cursor-pointer active:scale-[0.98]">
+<div class="w-16 h-16 bg-surface-container-high rounded-lg flex items-center justify-center mb-8 group-hover:bg-primary-container group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[32px] text-primary group-hover:text-white" data-icon="history_edu">history_edu</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Fluxo de Rescisão e Alterações</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-10 leading-relaxed">Gerencie encerramentos, solicitações de férias e alterações cadastrais ou salariais de forma ágil.</p>
+<div class="mt-auto flex items-center text-primary font-bold gap-2 group-hover:translate-x-2 transition-transform">
+<span class="font-label-md text-label-md">GERENCIAR ALTERAÇÕES</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Recent Activity Table (Asymmetric Layout Addition) -->
+<section class="mt-20">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-title-md text-title-md text-primary">Atividades Recentes</h3>
+<button class="text-primary font-bold flex items-center gap-1 hover:underline">
+<span class="font-label-md text-label-md">VER TODOS</span>
+</button>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 font-label-md text-label-md text-secondary">COLABORADOR</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary">TIPO DE FLUXO</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary">DATA</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary">STATUS</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary">AÇÃO</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-xs">RM</div>
+<span class="font-body-md text-body-md text-primary">Ricardo Mendes</span>
+</div>
+</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Admissão Digital</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">12/05/2024</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-variant text-primary border border-primary/10">Em Progresso</span>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:text-primary-container">
+<span class="material-symbols-outlined" data-icon="open_in_new">open_in_new</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed-dim flex items-center justify-center text-primary font-bold text-xs">AL</div>
+<span class="font-body-md text-body-md text-primary">Ana Lúcia Silva</span>
+</div>
+</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Alteração Salarial</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">10/05/2024</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">Concluído</span>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:text-primary-container">
+<span class="material-symbols-outlined" data-icon="open_in_new">open_in_new</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-6 mt-12 bg-surface dark:bg-primary-container border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max-width mx-auto gap-4">
+<div class="flex items-center gap-4">
+<span class="font-title-md text-title-md text-primary">RH Flow</span>
+<span class="hidden md:block w-px h-4 bg-outline-variant"></span>
+<p class="font-caption text-caption text-secondary dark:text-on-secondary-container">© 2024 RH Flow - Uso Interno Corporativo</p>
+</div>
+<nav class="flex gap-6">
+<a class="font-caption text-caption text-secondary dark:text-on-secondary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Termos de Uso</a>
+<a class="font-caption text-caption text-secondary dark:text-on-secondary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Privacidade</a>
+<a class="font-caption text-caption text-secondary dark:text-on-secondary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Ajuda</a>
+</nav>
+</div>
+</footer>
+</body></html>
