@@ -29,9 +29,29 @@ RECAPTCHA_SECRET_KEY=
 ADMIN_NAME=Administrador Inicial
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=troque-essa-senha
+RESEND_API_KEY=your_resend_api_key
+RESEND_SENDER_EMAIL=notificacoes@example.com
+RESEND_SENDER_NAME=RH Flow
+RESEND_NOTIFICATION_EMAILS=
 ```
 
 Se nenhuma variavel for informada, o projeto usa um banco local `local.db` apenas para desenvolvimento.
+
+## Notificacoes por e-mail
+
+O projeto pode enviar notificacoes pelo `Resend` quando:
+
+- um novo usuario e criado
+- um novo formulario e registrado pela primeira vez
+
+Para ativar:
+
+1. Gere uma chave de API no Resend
+2. Preencha `RESEND_API_KEY`
+3. Defina o remetente em `RESEND_SENDER_EMAIL` e `RESEND_SENDER_NAME`
+4. Opcionalmente preencha `RESEND_NOTIFICATION_EMAILS` com uma lista separada por virgula
+
+Mesmo sem `RESEND_NOTIFICATION_EMAILS`, o sistema tambem tenta avisar todos os usuarios aprovados com perfil `ADMIN` e `SUPER USER`.
 
 ## Scripts
 

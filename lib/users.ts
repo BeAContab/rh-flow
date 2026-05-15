@@ -1,5 +1,5 @@
 import { compare, hash } from "bcryptjs";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 
 import { ensureDatabase, getDb } from "@/lib/db";
 import type { AppRole } from "@/lib/roles";
@@ -30,7 +30,7 @@ export async function createUser(input: CreateUserInput) {
   const now = new Date();
   const passwordHash = await hashPassword(input.password);
 
-  await db.insert(users).values({
+  const createdUser = {
     id: crypto.randomUUID(),
     name: input.name.trim(),
     email: normalizedEmail,
@@ -40,7 +40,11 @@ export async function createUser(input: CreateUserInput) {
     createdByUserId: input.createdByUserId,
     createdAt: now,
     updatedAt: now,
-  });
+  };
+
+  await db.insert(users).values(createdUser);
+
+  return createdUser;
 }
 
 export async function findUserByEmail(email: string) {
@@ -79,6 +83,37 @@ export async function listUsers() {
   const db = getDb();
 
   return db.select().from(users).orderBy(desc(users.createdAt));
+}
+
+export async function listNotifiableUsers() {
+  await ensureDatabase();
+  const db = getDb();
+
+  return db
+    .select()
+    .from(users)
+    .where(inArray(users.role, ["admin", "super_user"]));
+}
+
+export async function findUserById(id: string) {
+  await ensureDatabase();
+  const db = getDb();
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function deleteUser(id: string) {
+  await ensureDatabase();
+  const db = getDb();
+
+  const targetUser = await findUserById(id);
+  if (!targetUser) {
+    return null;
+  }
+
+  await db.delete(users).where(eq(users.id, id));
+  return targetUser;
 }
 
 export async function adminExists() {

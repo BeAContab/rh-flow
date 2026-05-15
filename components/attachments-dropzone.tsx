@@ -2,6 +2,11 @@
 
 import { useRef, useState } from "react";
 
+import {
+  allowedAttachmentExtensions,
+  maxAttachmentsPerSubmission,
+  maxFilesPerUpload,
+} from "@/lib/attachment-policy";
 import type { AttachmentRecord } from "@/lib/schema";
 import { formatFileSize } from "@/lib/utils";
 
@@ -47,7 +52,7 @@ export function AttachmentsDropzone({
       <div className="border-b border-slate-200 pb-5">
         <h2 className="text-2xl font-semibold text-slate-900">Documentos anexos</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Arraste arquivos para esta area ou clique para selecionar documentos de apoio. Cada arquivo pode ter ate 4 MB.
+          Arraste arquivos para esta area ou clique para selecionar documentos de apoio. Cada arquivo pode ter ate 4 MB, com no maximo {maxFilesPerUpload} por envio e {maxAttachmentsPerSubmission} por relatorio.
         </p>
       </div>
 
@@ -73,10 +78,11 @@ export function AttachmentsDropzone({
       >
         <p className="text-base font-semibold text-slate-900">Solte os arquivos aqui</p>
         <p className="mt-2 text-sm text-slate-600">
-          Ou clique para escolher PDFs, imagens e outros documentos.
+          Ou clique para escolher PDFs, imagens, DOC, DOCX, XLS e XLSX.
         </p>
 
         <input
+          accept={allowedAttachmentExtensions.join(",")}
           ref={inputRef}
           className="hidden"
           multiple

@@ -106,7 +106,12 @@ export async function saveSubmission(input: SaveSubmissionInput) {
     });
   }
 
-  return { id };
+  return {
+    id,
+    created: existing.length === 0,
+    employerName,
+    employeeName,
+  };
 }
 
 export async function getSubmissionById(id: string) {

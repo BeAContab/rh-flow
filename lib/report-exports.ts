@@ -44,6 +44,20 @@ function stringifyValue(value: unknown): string {
   return String(value);
 }
 
+function escapeSpreadsheetFormula(value: string) {
+  const trimmed = value.trimStart();
+  if (!trimmed) {
+    return value;
+  }
+
+  const firstChar = trimmed.charAt(0);
+  if (firstChar === "=" || firstChar === "+" || firstChar === "-" || firstChar === "@") {
+    return `'${value}`;
+  }
+
+  return value;
+}
+
 export function getExportRows(submission: SubmissionRecord) {
   const definition = getDefinition(submission.flowType);
   const rows: Array<[string, string, string]> = [
@@ -62,7 +76,7 @@ export function getExportRows(submission: SubmissionRecord) {
       rows.push([
         section.title,
         field.label,
-        stringifyValue(submission.payload[field.name]),
+        escapeSpreadsheetFormula(stringifyValue(submission.payload[field.name])),
       ]);
       seenFields.add(field.name);
     }
@@ -73,7 +87,7 @@ export function getExportRows(submission: SubmissionRecord) {
       continue;
     }
 
-    rows.push(["Campos adicionais", key, stringifyValue(value)]);
+    rows.push(["Campos adicionais", key, escapeSpreadsheetFormula(stringifyValue(value))]);
   }
 
   return rows;

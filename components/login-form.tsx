@@ -5,9 +5,18 @@ import { useEffect, useRef, useState } from "react";
 declare global {
   interface Window {
     grecaptcha?: {
-      render: (container: HTMLElement, options: { sitekey: string; callback: (token: string) => void }) => number;
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+          "expired-callback"?: () => void;
+          "error-callback"?: () => void;
+        },
+      ) => number;
       reset: (widgetId?: number) => void;
     };
+    onRecaptchaLoadCallback?: () => void;
   }
 }
 
@@ -21,30 +30,68 @@ export function LoginForm({ recaptchaSiteKey }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaLoading, setCaptchaLoading] = useState(Boolean(recaptchaSiteKey));
+  const [captchaError, setCaptchaError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!recaptchaSiteKey) {
+    const siteKey = recaptchaSiteKey ?? "";
+    if (!siteKey) {
       return;
     }
 
-    const script = document.createElement("script");
-    script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      if (window.grecaptcha && recaptchaRef.current && widgetId.current === null) {
-        widgetId.current = window.grecaptcha.render(recaptchaRef.current, {
-          sitekey: recaptchaSiteKey,
-          callback: (token: string) => setCaptchaToken(token),
-        });
+    function renderCaptcha() {
+      if (!window.grecaptcha || !recaptchaRef.current || widgetId.current !== null) {
+        return;
       }
-    };
 
-    document.body.appendChild(script);
+      try {
+        widgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+          sitekey: siteKey,
+          callback: (token: string) => {
+            setCaptchaToken(token);
+            setCaptchaError("");
+          },
+          "expired-callback": () => {
+            setCaptchaToken("");
+          },
+          "error-callback": () => {
+            setCaptchaToken("");
+            setCaptchaError("Nao foi possivel carregar o reCAPTCHA. Recarregue a pagina e tente novamente.");
+          },
+        });
+        setCaptchaLoading(false);
+        setCaptchaError("");
+      } catch {
+        setCaptchaLoading(false);
+        setCaptchaError("O reCAPTCHA nao conseguiu ser renderizado. Verifique a chave do site e o dominio configurado.");
+      }
+    }
+
+    if (window.grecaptcha?.render) {
+      renderCaptcha();
+      return;
+    }
+
+    window.onRecaptchaLoadCallback = renderCaptcha;
+
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-recaptcha-script="true"]');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit";
+      script.async = true;
+      script.defer = true;
+      script.dataset.recaptchaScript = "true";
+      script.onerror = () => {
+        setCaptchaLoading(false);
+        setCaptchaError("Nao foi possivel carregar o reCAPTCHA. Verifique sua conexao e tente novamente.");
+      };
+      document.body.appendChild(script);
+    }
+
     return () => {
-      document.body.removeChild(script);
+      window.onRecaptchaLoadCallback = undefined;
     };
   }, [recaptchaSiteKey]);
 
@@ -66,7 +113,7 @@ export function LoginForm({ recaptchaSiteKey }: LoginFormProps) {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error || "Não foi possível entrar.");
+      setError(data.error || "Nao foi possivel entrar.");
       setLoading(false);
       if (window.grecaptcha && widgetId.current !== null) {
         window.grecaptcha.reset(widgetId.current);
@@ -104,10 +151,22 @@ export function LoginForm({ recaptchaSiteKey }: LoginFormProps) {
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700">reCAPTCHA</label>
           {recaptchaSiteKey ? (
-            <div ref={recaptchaRef} />
+            <div className="space-y-3">
+              <div className="min-h-[78px]" ref={recaptchaRef} />
+              {captchaLoading ? (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                  Carregando validacao de seguranca...
+                </div>
+              ) : null}
+              {captchaError ? (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  {captchaError}
+                </div>
+              ) : null}
+            </div>
           ) : (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-              reCAPTCHA não configurado. Em desenvolvimento, o login segue liberado sem o desafio.
+              reCAPTCHA nao configurado. Em desenvolvimento, o login segue liberado sem o desafio.
             </div>
           )}
         </div>

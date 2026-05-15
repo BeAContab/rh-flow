@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
 
 import type { AppRole } from "@/lib/roles";
+import { findUserById } from "@/lib/users";
 
 const SESSION_COOKIE = "fif_session";
 const encoder = new TextEncoder();
@@ -27,6 +28,7 @@ export async function createSession(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
+    .setNotBefore("0s")
     .setExpirationTime("7d")
     .sign(getSessionSecret());
 }
@@ -44,7 +46,21 @@ export async function getCurrentSession() {
   }
 
   try {
-    return await verifySession(token);
+    const session = await verifySession(token);
+    const currentUser = await findUserById(session.userId);
+
+    // Revalidate the session against the database so deletions revoke access promptly.
+    if (!currentUser || currentUser.status !== "approved") {
+      return null;
+    }
+
+    return {
+      ...session,
+      name: currentUser.name,
+      email: currentUser.email,
+      role: currentUser.role as AppRole,
+      status: currentUser.status,
+    };
   } catch {
     return null;
   }
@@ -78,7 +94,7 @@ export async function setSessionCookie(token: string) {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
