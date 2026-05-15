@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import type { AppRole } from "@/lib/roles";
 import { getRoleLabel } from "@/lib/roles";
@@ -11,6 +12,7 @@ type CreateUserFormProps = {
 };
 
 export function CreateUserForm({ allowedRoles, currentRole }: CreateUserFormProps) {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,6 +61,7 @@ export function CreateUserForm({ allowedRoles, currentRole }: CreateUserFormProp
     setMessage("Usuario criado com sucesso.");
     formElement.reset();
     setSelectedRole(allowedRoles[0] || "user");
+    router.refresh();
   }
 
   return (

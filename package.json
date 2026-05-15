@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
-    "seed:admin": "tsx scripts/seed-admin.ts"
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "security:cleanup": "tsx scripts/cleanup-security.ts"
   },
   "keywords": [],
   "author": "",

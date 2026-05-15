@@ -1,58 +1,15 @@
-import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
 import { createClient, type Client } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 
 let client: Client | null = null;
 let db: ReturnType<typeof drizzle> | null = null;
 let initialized = false;
-let envLoaded = false;
-
-function loadEnvFile(fileName: string) {
-  const filePath = resolve(process.cwd(), fileName);
-  if (!existsSync(filePath)) {
-    return;
-  }
-
-  const content = readFileSync(filePath, "utf-8");
-  const lines = content.split(/\r?\n/);
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) {
-      continue;
-    }
-
-    const [rawKey, ...rawValueParts] = trimmed.split("=");
-    const key = rawKey.trim();
-    const value = rawValueParts.join("=").trim();
-
-    if (!key || process.env[key]) {
-      continue;
-    }
-
-    process.env[key] = value;
-  }
-}
-
-function ensureEnvLoaded() {
-  if (envLoaded) {
-    return;
-  }
-
-  loadEnvFile(".env.local");
-  envLoaded = true;
-}
 
 function getDatabaseUrl() {
-  ensureEnvLoaded();
   return process.env.TURSO_DATABASE_URL || "file:local.db";
 }
 
 function getClient() {
-  ensureEnvLoaded();
-
   if (!client) {
     client = createClient({
       url: getDatabaseUrl(),
@@ -123,6 +80,57 @@ export async function ensureDatabase() {
     )
   `);
 
+  await currentClient.execute(`
+    CREATE TABLE IF NOT EXISTS user_audit_logs (
+      id TEXT PRIMARY KEY NOT NULL,
+      action TEXT NOT NULL,
+      actor_user_id TEXT NOT NULL,
+      actor_name TEXT NOT NULL,
+      actor_email TEXT NOT NULL,
+      actor_role TEXT NOT NULL,
+      target_user_id TEXT NOT NULL,
+      target_name TEXT NOT NULL,
+      target_email TEXT NOT NULL,
+      target_role TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    )
+  `);
+
+  await currentClient.execute(`
+    CREATE TABLE IF NOT EXISTS auth_rate_limits (
+      key TEXT PRIMARY KEY NOT NULL,
+      failed_count INTEGER NOT NULL DEFAULT 0,
+      first_failed_at INTEGER,
+      last_failed_at INTEGER,
+      blocked_until INTEGER,
+      updated_at INTEGER NOT NULL
+    )
+  `);
+
+  await currentClient.execute(`
+    CREATE TABLE IF NOT EXISTS api_rate_limits (
+      key TEXT PRIMARY KEY NOT NULL,
+      hit_count INTEGER NOT NULL DEFAULT 0,
+      window_started_at INTEGER,
+      blocked_until INTEGER,
+      updated_at INTEGER NOT NULL
+    )
+  `);
+
+  await currentClient.execute(`
+    CREATE TABLE IF NOT EXISTS security_events (
+      id TEXT PRIMARY KEY NOT NULL,
+      event_type TEXT NOT NULL,
+      actor_user_id TEXT,
+      actor_email TEXT,
+      actor_role TEXT,
+      ip_address TEXT,
+      target_key TEXT,
+      details TEXT,
+      created_at INTEGER NOT NULL
+    )
+  `);
+
   await addColumnIfMissing("submissions", "created_by_user_id", "TEXT");
   await addColumnIfMissing("submissions", "created_by_user_name", "TEXT");
   await addColumnIfMissing("submissions", "created_by_user_email", "TEXT");
@@ -139,6 +147,5 @@ async function addColumnIfMissing(tableName: string, columnName: string, definit
 }
 
 export function isUsingTurso() {
-  ensureEnvLoaded();
   return Boolean(process.env.TURSO_DATABASE_URL);
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { deleteAttachment, streamAttachmentDownload } from "@/lib/attachments";
+import { deleteAttachment, sanitizeDownloadFileName, streamAttachmentDownload } from "@/lib/attachments";
 import { getCurrentSession } from "@/lib/auth";
 
 type RouteContext = {
@@ -21,7 +21,7 @@ export async function GET(_: Request, context: RouteContext) {
 
   return new NextResponse(result.blob.stream, {
     headers: {
-      "Content-Disposition": `attachment; filename="${result.attachment.fileName}"`,
+      "Content-Disposition": `attachment; filename="${sanitizeDownloadFileName(result.attachment.fileName)}"`,
       "Content-Type": result.attachment.contentType,
     },
   });

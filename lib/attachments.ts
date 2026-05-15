@@ -1,12 +1,17 @@
 import { del, get, put } from "@vercel/blob";
 import { desc, eq, inArray } from "drizzle-orm";
 
+import {
+  allowedAttachmentExtensions,
+  allowedAttachmentMimeTypes,
+  maxAttachmentsPerSubmission,
+  maxAttachmentSizeInBytes,
+} from "@/lib/attachment-policy";
 import type { SessionPayload } from "@/lib/auth";
 import { ensureDatabase, getDb } from "@/lib/db";
 import { canEditSubmission, getVisibleSubmissionById } from "@/lib/submissions";
 import { attachments } from "@/lib/schema";
-
-export const maxAttachmentSizeInBytes = 4 * 1024 * 1024;
+const allowedAttachmentExtensionSet = new Set(allowedAttachmentExtensions);
 
 export type AttachmentWithAccess = typeof attachments.$inferSelect;
 
@@ -18,6 +23,34 @@ function sanitizeFileName(fileName: string) {
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "")
     .toLowerCase();
+}
+
+export function sanitizeDownloadFileName(fileName: string) {
+  return fileName
+    .replace(/[\r\n"]/g, "")
+    .replace(/[^\p{L}\p{N}._() -]+/gu, "-")
+    .trim() || "anexo";
+}
+
+function getFileExtension(fileName: string) {
+  const normalizedName = fileName.trim().toLowerCase();
+  const dotIndex = normalizedName.lastIndexOf(".");
+  return dotIndex >= 0 ? normalizedName.slice(dotIndex) : "";
+}
+
+export function validateAttachmentFile(file: File) {
+  if (file.size > maxAttachmentSizeInBytes) {
+    throw new Error("Cada arquivo deve ter no maximo 4 MB.");
+  }
+
+  const extension = getFileExtension(file.name || "");
+  if (!allowedAttachmentExtensionSet.has(extension as (typeof allowedAttachmentExtensions)[number])) {
+    throw new Error("Tipo de arquivo nao permitido. Envie apenas PDF, imagens, DOC, DOCX, XLS ou XLSX.");
+  }
+
+  if (file.type && !allowedAttachmentMimeTypes.has(file.type)) {
+    throw new Error("O tipo MIME do arquivo nao e permitido para upload.");
+  }
 }
 
 export async function listAttachmentsBySubmissionIds(submissionIds: string[]) {
@@ -70,11 +103,14 @@ export async function saveUploadedFilesForSubmission(
   const db = getDb();
   const now = new Date();
   const createdAttachments: AttachmentWithAccess[] = [];
+  const existingAttachments = await listAttachmentsForSubmission(submissionId);
+
+  if (existingAttachments.length + files.length > maxAttachmentsPerSubmission) {
+    throw new Error(`Cada relatorio pode ter no maximo ${maxAttachmentsPerSubmission} anexos.`);
+  }
 
   for (const file of files) {
-    if (file.size > maxAttachmentSizeInBytes) {
-      throw new Error("Cada arquivo deve ter no maximo 4 MB.");
-    }
+    validateAttachmentFile(file);
 
     const safeName = sanitizeFileName(file.name || "documento");
     const pathname = `submissions/${submissionId}/${Date.now()}-${safeName}`;

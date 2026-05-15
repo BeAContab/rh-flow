@@ -32,3 +32,16 @@ export function getCreatableRoles(role: AppRole): AppRole[] {
 export function canCreateRole(actorRole: AppRole, targetRole: AppRole) {
   return getCreatableRoles(actorRole).includes(targetRole);
 }
+
+// Deletion follows stricter rules than creation to protect privileged accounts.
+export function canDeleteRole(actorRole: AppRole, targetRole: AppRole) {
+  if (actorRole === "admin") {
+    return targetRole === "super_user" || targetRole === "user";
+  }
+
+  if (actorRole === "super_user") {
+    return targetRole === "user";
+  }
+
+  return false;
+}
