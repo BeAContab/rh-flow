@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f7fb;
+  --background: linear-gradient(180deg, #f8fbff 0%, #f3f6fb 100%);
   --surface: #ffffff;
   --surface-soft: #eaf0fb;
   --border: #d2dceb;
@@ -10,6 +10,18 @@
   --primary: #17325d;
   --primary-strong: #0d2143;
   --success: #0f8a5f;
+}
+
+html.dark {
+  --background: linear-gradient(180deg, #0b1220 0%, #07101a 100%);
+  --surface: #071221;
+  --surface-soft: #0a1522;
+  --border: #11202b;
+  --text: #d7e6f5;
+  --muted: #9fb0c6;
+  --primary: #7aa7ff;
+  --primary-strong: #4a84ff;
+  --success: #3bd18b;
 }
 
 * {
@@ -22,7 +34,7 @@ html {
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #f8fbff 0%, #f3f6fb 100%);
+  background: var(--background);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
 }
